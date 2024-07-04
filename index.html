@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Url</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Tracking</h1>
+        <div id="lottie-animation" class="lottie-animation"></div>
+        <form id="orderForm">
+            <div class="form-group">
+                <label for="orderId">Enter OrderID</label>
+                <input type="text" id="orderId" name="orderId" placeholder="Enter your orderId" required>
+            </div>
+            <button type="submit"><i class="fas fa-link"></i> Generate Link</button>
+        </form>
+        <div id="resultContainer">
+            <p id="result"></p>
+            <button id="copyButton" onclick="copyToClipboard()" style="display: none;"><i class="fas fa-copy"></i> Copy Link</button>
+        </div>
+        <p id="shortenInstruction"></p>
+        <div id="notification" class="notification">Link copied to clipboard</div>
+
+        <h2>Track My Order</h2>
+        <form id="trackOrderForm">
+            <div class="form-group">
+                <label for="trackingId">Enter Tracking ID</label>
+                <input type="text" id="trackingId" name="trackingId" placeholder="Enter your tracking ID" required>
+            </div>
+            <button type="submit"><i class="fas fa-search"></i> Track Order</button>
+        </form>
+        <div id="trackingResult"></div>
+        <script src="index.js"></script>
+    </div>
+</body>
+</html>
