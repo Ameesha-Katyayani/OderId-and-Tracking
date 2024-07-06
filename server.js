@@ -82,10 +82,11 @@ async function fetchShiprocketTracking(orderId) {
         Authorization: `Bearer ${bearerShipToken}`,
       },
     });
-
+      
     if (response.data ) {
       console.log("Shiprocket tracking data found.");
-      return { provider: 'shiprocket', data: response.data.data};
+      console.log(response.data);
+      return { provider: 'shiprocket', data: response.data};
     } else {
       console.log("No Shiprocket tracking data found.");
       return null;
