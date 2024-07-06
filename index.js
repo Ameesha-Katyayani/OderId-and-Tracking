@@ -1,3 +1,27 @@
+// const url = 'https://http-cors-proxy.p.rapidapi.com/';
+// const options = {
+// 	method: 'POST',
+// 	headers: {
+// 		'x-rapidapi-key': '9147d18b40msh507eb3d5fdcf60dp12917cjsnd18cb37f6313',
+// 		'x-rapidapi-host': 'http-cors-proxy.p.rapidapi.com',
+// 		'Content-Type': 'application/json',
+// 		Origin: 'www.example.com',
+// 		'X-Requested-With': 'www.example.com'
+// 	},
+// 	body: {
+// 		url: 'https://track.delhivery.com/api/v1/packages/json/?waybill&ref_ids='
+// 	}
+// };
+
+try {
+	const response = await fetch(url, options);
+	const result = await response.text();
+	console.log(result);
+} catch (error) {
+	console.error(error);
+}
+
+
 var animation = lottie.loadAnimation({
   container: document.getElementById("lottie-animation"),
   renderer: "svg",
@@ -54,6 +78,7 @@ function copyToClipboard() {
     notification.className = notification.className.replace("show", "");
   }, 3000);
 }
+
 document
   .getElementById("trackOrderForm")
   .addEventListener("submit", function (event) {
@@ -65,15 +90,34 @@ document
     if (trackingId) {
       trackOrder(trackingId)
         .then((data) => {
-          console.log("Tracking data:", data);
-          if (data) {
-            trackingResult.innerHTML = `
-                    <h3>Tracking Information</h3>
-                    <p><strong>Status:</strong> ${data.status}</p>
-                    <p><strong>Current Location:</strong> ${data.current_location}</p>
-                    <p><strong>Expected Delivery:</strong> ${data.expected_delivery}</p>
-                    <p><strong>Details:</strong> ${data.details}</p>
-                `;
+          if (data && data[0] && data[0][trackingId]) {
+            const trackingData = data[0][trackingId].tracking_data;
+
+            if (trackingData.error) {
+              trackingResult.textContent = trackingData.error;
+            } else {
+              trackingResult.innerHTML = `
+              <h3>Tracking Information</h3>
+              <p><strong>Status:</strong> ${
+                trackingData.shipment_track[0].current_status || "N/A"
+              }</p>
+              <p><strong>Courier Name:</strong> ${
+                trackingData.shipment_track[0].courier_name || "N/A"
+              }</p>
+              <p><strong>Consignee Name:</strong> ${
+                trackingData.shipment_track[0].consignee_name || "N/A"
+              }</p>
+              <p><strong>Destination:</strong> ${
+                trackingData.shipment_track[0].destination || "N/A"
+              }</p>
+              <p><strong>Delivered Date:</strong> ${
+                trackingData.shipment_track[0].delivered_date || "N/A"
+              }</p>
+              <p><strong>Origin:</strong> ${
+                trackingData.shipment_track[0].origin || "N/A"
+              }</p>
+            `;
+            }
           } else {
             trackingResult.textContent = "Tracking information not found.";
           }
@@ -87,112 +131,19 @@ document
     }
   });
 
-async function refreshAccessToken() {
-  try {
-    const response = await fetch(
-      "https://apiv2.shiprocket.in/v1/external/auth/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: "katyayanimanager@gmail.com",
-          password: "Kyu@121",
-        }),
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      bearerShipToken = data.token;
-      tokenShipExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // Token valid for 24 hours
-      console.log("Shiprocket token refreshed successfully:", bearerShipToken);
-    } else {
-      console.error("Failed to refresh access token", response.statusText);
-    }
-  } catch (e) {
-    console.error("Error refreshing access token:", e);
-  }
-}
-
-async function fetchShiprocketTracking(orderId) {
-  if (new Date() > tokenShipExpiry) {
-    await refreshAccessToken();
-  }
-
-  try {
-    const response = await fetch(
-      `https://apiv2.shiprocket.in/v1/external/courier/track?order_id=${orderId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${bearerShipToken}`,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Shiprocket tracking info:", data);
-      return data;
-    } else {
-      console.error(
-        "Failed to fetch Shiprocket tracking info",
-        response.statusText
-      );
-      return null;
-    }
-  } catch (e) {
-    console.error("Error fetching Shiprocket tracking info:", e);
-    return null;
-  }
-}
-
-async function fetchDelhiveryTracking(waybill) {
-  try {
-    const response = await fetch(
-      `https://track.delhivery.com/api/v1/packages/json/?waybill=${waybill}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer 4e1f89ad2cf0bbadf1df3cdeded6301bab0ac3bb`,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Delhivery tracking info:", data);
-      return data;
-    } else {
-      console.error(
-        "Failed to fetch Delhivery tracking info",
-        response.statusText
-      );
-      return null;
-    }
-  } catch (e) {
-    console.error("Error fetching Delhivery tracking info:", e);
-    return null;
-  }
-}
-
 async function trackOrder(trackingId) {
-  let trackingInfo;
+  const response = await fetch("http://localhost:3000/track/${trackingId}", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    }
+    //body: JSON.stringify({ trackingId }),
+  });
 
-  if (trackingId.startsWith("SR")) {
-    trackingInfo = await fetchShiprocketTracking(trackingId);
+  if (response.ok) {
+    return response.json();
   } else {
-    trackingInfo = await fetchDelhiveryTracking(trackingId);
-  }
-
-  if (trackingInfo) {
-    return {
-      status: trackingInfo.status || "Unknown",
-      current_location: trackingInfo.current_location || "Unknown",
-      expected_delivery: trackingInfo.expected_delivery || "Unknown",
-      details: JSON.stringify(trackingInfo),
-    };
-  } else {
+    console.error("Failed to fetch tracking information", response.statusText);
     return null;
   }
 }

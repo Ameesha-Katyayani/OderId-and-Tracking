@@ -1,0 +1,28 @@
+{
+  "name": "formurl",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000F\u0000o\u0000r\u0000m\u0000U\u0000r\u0000l\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ameesha-Katyayani/OderId-and-Tracking.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ameesha-Katyayani/OderId-and-Tracking/issues"
+  },
+  "homepage": "https://github.com/Ameesha-Katyayani/OderId-and-Tracking#readme",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "request": "^2.88.2"
+  }
+}
