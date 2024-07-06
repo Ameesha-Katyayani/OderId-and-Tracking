@@ -60,37 +60,19 @@ function copyToClipboard() {
 document.getElementById("trackOrderForm").addEventListener("submit", function (event) {
   event.preventDefault();
 
-  var trackingId = document.getElementById("trackingId").value;
-  var trackingResult = document.getElementById("trackingResult");
-  console.log("Tracking ID entered:", trackingId);
+  const trackingId = document.getElementById("trackingId").value;
+  const provider = document.getElementById("provider").value;
+  const trackingResult = document.getElementById("trackingResult");
 
-  if (trackingId) {
-    trackOrder(trackingId)
+  console.log("Tracking ID entered:", trackingId);
+  console.log("Provider selected:", provider);
+
+  if (trackingId && provider) {
+    trackOrder(trackingId, provider)
       .then((data) => {
         console.log("Tracking Data:", data);
         if (data) {
-          const trackingData = data.ShipmentData[0].Shipment;
-
-          if (trackingData) {
-            const scans = trackingData.Scans.map(scan => `
-              <p>
-                <strong>Date:</strong> ${new Date(scan.ScanDetail.ScanDateTime).toLocaleString()}<br/>
-                <strong>Status:</strong> ${scan.ScanDetail.Scan}<br/>
-                <strong>Location:</strong> ${scan.ScanDetail.ScannedLocation}<br/>
-                <strong>Instructions:</strong> ${scan.ScanDetail.Instructions}
-              </p>
-            `).join("");
-
-            trackingResult.innerHTML = `
-              <h3>Tracking Information</h3>
-              <p><strong>Status:</strong> ${trackingData.Status.Status || "N/A"}</p>
-              <p><strong>Current Location:</strong> ${trackingData.Status.StatusLocation || "N/A"}</p>
-              <p><strong>Expected Delivery:</strong> ${new Date(trackingData.ExpectedDeliveryDate).toLocaleString() || "N/A"}</p>
-              <div><strong>Scans:</strong> ${scans}</div>
-            `;
-          } else {
-            trackingResult.textContent = "No tracking information available.";
-          }
+          displayTrackingData(data, provider);
         } else {
           trackingResult.textContent = "Tracking information not found.";
         }
@@ -100,13 +82,13 @@ document.getElementById("trackOrderForm").addEventListener("submit", function (e
         console.error("Error fetching tracking information:", error);
       });
   } else {
-    trackingResult.textContent = "Please enter a Tracking ID.";
+    trackingResult.textContent = "Please enter a Tracking ID and select a Provider.";
   }
 });
 
-async function trackOrder(trackingId) {
+async function trackOrder(trackingId, provider) {
   try {
-    const response = await fetch(`http://localhost:3000/track?trackingId=${trackingId}`);
+    const response = await fetch(`http://localhost:3000/track?trackingId=${trackingId}&provider=${provider}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -119,5 +101,38 @@ async function trackOrder(trackingId) {
   } catch (error) {
     console.error("Error in trackOrder function:", error);
     return null;
+  }
+}
+
+function displayTrackingData(data, provider) {
+  const trackingResult = document.getElementById("trackingResult");
+
+  if (provider === "delhivery") {
+    const trackingData = data.ShipmentData[0].Shipment;
+    const scans = trackingData.Scans.map(scan => `
+      <p>
+        <strong>Date:</strong> ${new Date(scan.ScanDetail.ScanDateTime).toLocaleString()}<br/>
+        <strong>Status:</strong> ${scan.ScanDetail.Scan}<br/>
+        <strong>Location:</strong> ${scan.ScanDetail.ScannedLocation}<br/>
+        <strong>Instructions:</strong> ${scan.ScanDetail.Instructions}
+      </p>
+    `).join("");
+
+    trackingResult.innerHTML = `
+      <h3>Tracking Information</h3>
+      <p><strong>Status:</strong> ${trackingData.Status.Status || "N/A"}</p>
+      <p><strong>Current Location:</strong> ${trackingData.Status.StatusLocation || "N/A"}</p>
+      <p><strong>Expected Delivery:</strong> ${new Date(trackingData.ExpectedDeliveryDate).toLocaleString() || "N/A"}</p>
+      <div><strong>Scans:</strong> ${scans}</div>
+    `;
+  } else if (provider === "shiprocket") {
+    trackingResult.innerHTML = `
+      <h3>Tracking Information</h3>
+      <p><strong>Status:</strong> ${data.status || "N/A"}</p>
+      <p><strong>Shipment ID:</strong> ${data.shipment_id || "N/A"}</p>
+      <p><strong>Pickup Date:</strong> ${data.pickup_date || "N/A"}</p>
+      <p><strong>Delivered Date:</strong> ${data.delivered_date || "N/A"}</p>
+      <p><strong>Current Status:</strong> ${data.current_status || "N/A"}</p>
+    `;
   }
 }
