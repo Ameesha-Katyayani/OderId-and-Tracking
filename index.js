@@ -55,43 +55,50 @@ function copyToClipboard() {
   }, 3000);
 }
 
-document.getElementById("trackOrderForm").addEventListener("submit", function (event) {
-  event.preventDefault();
+document
+  .getElementById("trackOrderForm")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
 
-  const trackingId = document.getElementById("trackingId").value;
-  const trackingResult = document.getElementById("trackingResult");
+    const trackingId = document.getElementById("trackingId").value;
+    const trackingResult = document.getElementById("trackingResult");
 
-  console.log("Tracking ID entered:", trackingId);
+    console.log("Tracking ID entered:", trackingId);
 
-  if (trackingId) {
-    trackOrder(trackingId)
-      .then((data) => {
-        console.log("Tracking Data:", data);
-        if (data) {
-          displayTrackingData(data);
-        } else {
-          trackingResult.textContent = "Tracking information not found.";
-        }
-      })
-      .catch((error) => {
-        trackingResult.textContent = "Error fetching tracking information.";
-        console.error("Error fetching tracking information:", error);
-      });
-  } else {
-    trackingResult.textContent = "Please enter a Tracking ID.";
-  }
-});
+    if (trackingId) {
+      trackOrder(trackingId)
+        .then((data) => {
+          console.log("Tracking Data:", data);
+          if (data) {
+            displayTrackingData(data);
+          } else {
+            trackingResult.textContent = "Tracking information not found.";
+          }
+        })
+        .catch((error) => {
+          trackingResult.textContent = "Error fetching tracking information.";
+          console.error("Error fetching tracking information:", error);
+        });
+    } else {
+      trackingResult.textContent = "Please enter a Tracking ID.";
+    }
+  });
 
 async function trackOrder(trackingId) {
   try {
-    const response = await fetch(`http://localhost:3000/track?trackingId=${trackingId}`);
-    
+    const response = await fetch(
+      `https://oderid-and-tracking.onrender.com/track?trackingId=${trackingId}`
+    );
+
     if (response.ok) {
       const data = await response.json();
       console.log("Response data:", data);
       return data;
     } else {
-      console.error('Failed to fetch tracking information', response.statusText);
+      console.error(
+        "Failed to fetch tracking information",
+        response.statusText
+      );
       return null;
     }
   } catch (error) {
@@ -105,31 +112,49 @@ function displayTrackingData(data) {
 
   if (data.provider === "delhivery") {
     const trackingData = data.data;
-    const scans = trackingData.Scans.map(scan => `
+    const scans = trackingData.Scans.map(
+      (scan) => `
       <p>
-        <strong>Date:</strong> ${new Date(scan.ScanDetail.ScanDateTime).toLocaleString()}<br/>
+        <strong>Date:</strong> ${new Date(
+          scan.ScanDetail.ScanDateTime
+        ).toLocaleString()}<br/>
         <strong>Status:</strong> ${scan.ScanDetail.Scan}<br/>
         <strong>Location:</strong> ${scan.ScanDetail.ScannedLocation}<br/>
         <strong>Instructions:</strong> ${scan.ScanDetail.Instructions}
       </p>
-    `).join("");
+    `
+    ).join("");
 
     trackingResult.innerHTML = `
       <h3>Tracking Information</h3>
       <p><strong>Status:</strong> ${trackingData.Status.Status || "N/A"}</p>
-      <p><strong>Current Location:</strong> ${trackingData.Status.StatusLocation || "N/A"}</p>
-      <p><strong>Expected Delivery:</strong> ${new Date(trackingData.ExpectedDeliveryDate).toLocaleString() || "N/A"}</p>
+      <p><strong>Current Location:</strong> ${
+        trackingData.Status.StatusLocation || "N/A"
+      }</p>
+      <p><strong>Expected Delivery:</strong> ${
+        new Date(trackingData.ExpectedDeliveryDate).toLocaleString() || "N/A"
+      }</p>
       <div><strong>Scans:</strong> ${scans}</div>
     `;
   } else if (data.provider === "shiprocket") {
     const trackingData = data.data;
     trackingResult.innerHTML = `
       <h3>Tracking Information</h3>
-      <p><strong>Status:</strong> ${trackingData.current_status || "N/A"}</p>
-      <p><strong>Shipment ID:</strong> ${trackingData.shipment_id || "N/A"}</p>
-      <p><strong>Pickup Date:</strong> ${trackingData.pickup_date || "N/A"}</p>
-      <p><strong>Delivered Date:</strong> ${trackingData.delivered_date || "N/A"}</p>
-      <p><strong>Current Status:</strong> ${trackingData.current_status || "N/A"}</p>
+      <p><strong>Status:</strong> ${
+        trackingData.shipment_track.current_status || "N/A"
+      }</p>
+      <p><strong>Shipment ID:</strong> ${
+        trackingData.shipment_track.id || "N/A"
+      }</p>
+      <p><strong>Pickup Date:</strong> ${
+        trackingData.shipment_track.pickup_date || "N/A"
+      }</p>
+      <p><strong>Delivered Date:</strong> ${
+        trackingData.shipment_track.delivered_date || "N/A"
+      }</p>
+      <p><strong>Current Status:</strong> ${
+        trackingData.shipment_track.current_status || "N/A"
+      }</p>
     `;
   }
 }
