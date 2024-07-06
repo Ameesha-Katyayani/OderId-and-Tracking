@@ -1,5 +1,3 @@
-
-
 var animation = lottie.loadAnimation({
   container: document.getElementById("lottie-animation"),
   renderer: "svg",
@@ -61,18 +59,16 @@ document.getElementById("trackOrderForm").addEventListener("submit", function (e
   event.preventDefault();
 
   const trackingId = document.getElementById("trackingId").value;
-  const provider = document.getElementById("provider").value;
   const trackingResult = document.getElementById("trackingResult");
 
   console.log("Tracking ID entered:", trackingId);
-  console.log("Provider selected:", provider);
 
-  if (trackingId && provider) {
-    trackOrder(trackingId, provider)
+  if (trackingId) {
+    trackOrder(trackingId)
       .then((data) => {
         console.log("Tracking Data:", data);
         if (data) {
-          displayTrackingData(data, provider);
+          displayTrackingData(data);
         } else {
           trackingResult.textContent = "Tracking information not found.";
         }
@@ -82,13 +78,13 @@ document.getElementById("trackOrderForm").addEventListener("submit", function (e
         console.error("Error fetching tracking information:", error);
       });
   } else {
-    trackingResult.textContent = "Please enter a Tracking ID and select a Provider.";
+    trackingResult.textContent = "Please enter a Tracking ID.";
   }
 });
 
-async function trackOrder(trackingId, provider) {
+async function trackOrder(trackingId) {
   try {
-    const response = await fetch(`http://localhost:3000/track?trackingId=${trackingId}&provider=${provider}`);
+    const response = await fetch(`http://localhost:3000/track?trackingId=${trackingId}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -104,11 +100,11 @@ async function trackOrder(trackingId, provider) {
   }
 }
 
-function displayTrackingData(data, provider) {
+function displayTrackingData(data) {
   const trackingResult = document.getElementById("trackingResult");
 
-  if (provider === "delhivery") {
-    const trackingData = data.ShipmentData[0].Shipment;
+  if (data.provider === "delhivery") {
+    const trackingData = data.data;
     const scans = trackingData.Scans.map(scan => `
       <p>
         <strong>Date:</strong> ${new Date(scan.ScanDetail.ScanDateTime).toLocaleString()}<br/>
@@ -125,14 +121,15 @@ function displayTrackingData(data, provider) {
       <p><strong>Expected Delivery:</strong> ${new Date(trackingData.ExpectedDeliveryDate).toLocaleString() || "N/A"}</p>
       <div><strong>Scans:</strong> ${scans}</div>
     `;
-  } else if (provider === "shiprocket") {
+  } else if (data.provider === "shiprocket") {
+    const trackingData = data.data;
     trackingResult.innerHTML = `
       <h3>Tracking Information</h3>
-      <p><strong>Status:</strong> ${data.status || "N/A"}</p>
-      <p><strong>Shipment ID:</strong> ${data.shipment_id || "N/A"}</p>
-      <p><strong>Pickup Date:</strong> ${data.pickup_date || "N/A"}</p>
-      <p><strong>Delivered Date:</strong> ${data.delivered_date || "N/A"}</p>
-      <p><strong>Current Status:</strong> ${data.current_status || "N/A"}</p>
+      <p><strong>Status:</strong> ${trackingData.current_status || "N/A"}</p>
+      <p><strong>Shipment ID:</strong> ${trackingData.shipment_id || "N/A"}</p>
+      <p><strong>Pickup Date:</strong> ${trackingData.pickup_date || "N/A"}</p>
+      <p><strong>Delivered Date:</strong> ${trackingData.delivered_date || "N/A"}</p>
+      <p><strong>Current Status:</strong> ${trackingData.current_status || "N/A"}</p>
     `;
   }
 }
