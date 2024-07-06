@@ -83,7 +83,7 @@ async function fetchShiprocketTracking(orderId) {
       },
     });
 
-    if (response.data && response.data.data) {
+    if (response.data ) {
       console.log("Shiprocket tracking data found.");
       return { provider: 'shiprocket', data: response.data.data };
     } else {
