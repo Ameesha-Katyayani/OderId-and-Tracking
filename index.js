@@ -29,7 +29,7 @@ document
       result.style.color = "green";
 
       copyButton.style.display = "inline-flex";
-      //  shortenInstruction.innerHTML = 'To shorten this URL, <a href="https://tinyurl.com/create.php?url=' + encodeURIComponent(fullUrl) + '" target="_blank">click here to create a TinyURL</a>.';
+      // shortenInstruction.innerHTML = 'To shorten this URL, <a href="https://tinyurl.com/create.php?url=' + encodeURIComponent(fullUrl) + '" target="_blank">click here to create a TinyURL</a>.';
       shortenInstruction.style.color = "black";
     } else {
       result.textContent = "Please enter an Order ID.";
@@ -38,6 +38,37 @@ document
       shortenInstruction.textContent = "";
     }
   });
+
+document.getElementById("trackOrderButton").addEventListener("click", function () {
+  var trackingId = document.getElementById("orderId").value;
+  var trackingResult = document.getElementById("trackingResult");
+
+  console.log("Tracking ID entered:", trackingId);
+
+  if (trackingId) {
+    trackOrder(trackingId)
+      .then((data) => {
+        console.log("Tracking Data:", data);
+        if (data) {
+          displayTrackingData(data);
+        } else {
+          trackingResult.textContent = "Tracking information not found.";
+          trackingResult.style.color = "red";
+          trackingResult.style.display = "block";
+        }
+      })
+      .catch((error) => {
+        trackingResult.textContent = "Error fetching tracking information.";
+        trackingResult.style.color = "red";
+        trackingResult.style.display = "block";
+        console.error("Error fetching tracking information:", error);
+      });
+  } else {
+    trackingResult.textContent = "Please enter a Tracking ID.";
+    trackingResult.style.color = "red";
+    trackingResult.style.display = "block";
+  }
+});
 
 function copyToClipboard() {
   var linkText = document.querySelector("#result a").href;
@@ -54,35 +85,6 @@ function copyToClipboard() {
     notification.className = notification.className.replace("show", "");
   }, 3000);
 }
-
-document
-  .getElementById("trackOrderForm")
-  .addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    const trackingId = document.getElementById("trackingId").value;
-    const trackingResult = document.getElementById("trackingResult");
-
-    console.log("Tracking ID entered:", trackingId);
-
-    if (trackingId) {
-      trackOrder(trackingId)
-        .then((data) => {
-          console.log("Tracking Data:", data);
-          if (data) {
-            displayTrackingData(data);
-          } else {
-            trackingResult.textContent = "Tracking information not found.";
-          }
-        })
-        .catch((error) => {
-          trackingResult.textContent = "Error fetching tracking information.";
-          console.error("Error fetching tracking information:", error);
-        });
-    } else {
-      trackingResult.textContent = "Please enter a Tracking ID.";
-    }
-  });
 
 async function trackOrder(trackingId) {
   try {
@@ -109,21 +111,12 @@ async function trackOrder(trackingId) {
 
 function displayTrackingData(data) {
   const trackingResult = document.getElementById("trackingResult");
+  trackingResult.style.display = "block";
 
   if (data.provider === "delhivery") {
     const trackingData = data.data;
-    const scans = trackingData.Scans.map(
-      (scan) => `
-      <p>
-        <strong>Date:</strong> ${new Date(
-          scan.ScanDetail.ScanDateTime
-        ).toLocaleString()}<br/>
-        <strong>Status:</strong> ${scan.ScanDetail.Scan}<br/>
-        <strong>Location:</strong> ${scan.ScanDetail.ScannedLocation}<br/>
-        <strong>Instructions:</strong> ${scan.ScanDetail.Instructions}
-      </p>
-    `
-    ).join("");
+    const latestScan =
+      trackingData.Scans[trackingData.Scans.length - 1].ScanDetail;
 
     trackingResult.innerHTML = `
       <h3>Tracking Information</h3>
@@ -134,26 +127,25 @@ function displayTrackingData(data) {
       <p><strong>Expected Delivery:</strong> ${
         new Date(trackingData.ExpectedDeliveryDate).toLocaleString() || "N/A"
       }</p>
-      <div><strong>Scans:</strong> ${scans}</div>
     `;
   } else if (data.provider === "shiprocket") {
     const trackingData = data.data;
     trackingResult.innerHTML = `
       <h3>Tracking Information</h3>
       <p><strong>Status:</strong> ${
-        trackingData.shipment_track.current_status || "N/A"
+        trackingData.shipment_track[0].current_status || "N/A"
       }</p>
       <p><strong>Shipment ID:</strong> ${
-        trackingData.shipment_track.id || "N/A"
+        trackingData.shipment_track[0].id || "N/A"
       }</p>
       <p><strong>Pickup Date:</strong> ${
-        trackingData.shipment_track.pickup_date || "N/A"
+        trackingData.shipment_track[0].pickup_date || "N/A"
       }</p>
       <p><strong>Delivered Date:</strong> ${
-        trackingData.shipment_track.delivered_date || "N/A"
+        trackingData.shipment_track[0].delivered_date || "N/A"
       }</p>
       <p><strong>Current Status:</strong> ${
-        trackingData.shipment_track.current_status || "N/A"
+        trackingData.shipment_track[0].current_status || "N/A"
       }</p>
     `;
   }
