@@ -6,12 +6,14 @@ const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
+app.use(cors());
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-  next();
-});
+
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "*");
+//   next();
+// });
 
 const DELHIVERY_API_URL = "https://track.delhivery.com/api/v1/packages/json/?waybill&ref_ids=";
 const SHIPROCKET_API_URL = "https://apiv2.shiprocket.in/v1/external/courier/track?order_id=";
