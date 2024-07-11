@@ -9,20 +9,16 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+  res.header("Access-Control-Allow-Headers", "*");
   next();
 });
-const DELHIVERY_API_URL =
-  "https://track.delhivery.com/api/v1/packages/json/?waybill&ref_ids=";
-const SHIPROCKET_API_URL =
-  "https://apiv2.shiprocket.in/v1/external/courier/track?order_id=";
-const SHIPROCKET_EMAIL = "katyayanimanager@gmail.com";
-const SHIPROCKET_PASSWORD = "Kyu@121";
 
-let bearerShipToken = "";
+const DELHIVERY_API_URL = "https://track.delhivery.com/api/v1/packages/json/?waybill&ref_ids=";
+const SHIPROCKET_API_URL = "https://apiv2.shiprocket.in/v1/external/courier/track?order_id=";
+const SHIPROCKET_EMAIL = 'katyayanimanager@gmail.com';
+const SHIPROCKET_PASSWORD = 'Kyu@121';
+
+let bearerShipToken = '';
 let tokenShipExpiry = new Date();
 
 app.get("/track", async (req, res) => {
@@ -46,9 +42,7 @@ app.get("/track", async (req, res) => {
     return res.json(trackingData);
   } else {
     console.error("Error fetching tracking information from both providers.");
-    return res
-      .status(500)
-      .json({ error: "Error fetching tracking information." });
+    return res.status(500).json({ error: "Error fetching tracking information." });
   }
 });
 
@@ -62,25 +56,15 @@ async function fetchDelhiveryTracking(waybill) {
       },
     });
 
-    if (
-      response.data &&
-      response.data.ShipmentData &&
-      response.data.ShipmentData.length > 0
-    ) {
+    if (response.data && response.data.ShipmentData && response.data.ShipmentData.length > 0) {
       console.log("Delhivery tracking data found.");
-      return {
-        provider: "delhivery",
-        data: response.data.ShipmentData[0].Shipment,
-      };
+      return { provider: 'delhivery', data: response.data.ShipmentData[0].Shipment };
     } else {
       console.log("No Delhivery tracking data found.");
       return null;
     }
   } catch (error) {
-    console.error(
-      "Error fetching Delhivery tracking data:",
-      error.response ? error.response.data : error.message
-    );
+    console.error("Error fetching Delhivery tracking data:", error.response ? error.response.data : error.message);
     return null;
   }
 }
@@ -98,20 +82,17 @@ async function fetchShiprocketTracking(orderId) {
         Authorization: `Bearer ${bearerShipToken}`,
       },
     });
-
-    if (response.data) {
+      
+    if (response.data ) {
       console.log("Shiprocket tracking data found.");
       console.log(response.data);
-      return { provider: "shiprocket", data: response.data[0].tracking_data };
+      return { provider: 'shiprocket', data: response.data[0].tracking_data};
     } else {
       console.log("No Shiprocket tracking data found.");
       return null;
     }
   } catch (error) {
-    console.error(
-      "Error fetching Shiprocket tracking data:",
-      error.response ? error.response.data : error.message
-    );
+    console.error("Error fetching Shiprocket tracking data:", error.response ? error.response.data : error.message);
     return null;
   }
 }
@@ -119,25 +100,18 @@ async function fetchShiprocketTracking(orderId) {
 async function refreshAccessToken() {
   try {
     console.log("Refreshing Shiprocket access token...");
-    const response = await axios.post(
-      "https://apiv2.shiprocket.in/v1/external/auth/login",
-      {
-        email: SHIPROCKET_EMAIL,
-        password: SHIPROCKET_PASSWORD,
-      },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    const response = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
+      email: SHIPROCKET_EMAIL,
+      password: SHIPROCKET_PASSWORD,
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    });
 
     bearerShipToken = response.data.token;
     tokenShipExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
     console.log("Refreshed Shiprocket access token:", bearerShipToken);
   } catch (error) {
-    console.error(
-      "Error refreshing Shiprocket access token:",
-      error.response ? error.response.data : error.message
-    );
+    console.error("Error refreshing Shiprocket access token:", error.response ? error.response.data : error.message);
   }
 }
 
