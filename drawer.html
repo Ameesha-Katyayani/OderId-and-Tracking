@@ -1,0 +1,83 @@
+<div class="hamburger-menu">
+  <i class="fas fa-bars" id="menuButton"></i>
+</div>
+
+<div class="drawer" id="drawer">
+  <ul>
+    <li class="drawer-item" onclick="navigateToUserScreen()">Users</li>
+    <li class="drawer-item" onclick="navigateToSoilTestingScreen()">
+      Soil Testing
+    </li>
+    <li class="drawer-item" onclick="navigateToWaterTestingScreen()">
+      Water Testing
+    </li>
+    <li class="drawer-item" onclick="closeDrawer()">Close</li>
+  </ul>
+</div>
+
+<script>
+  // Drawer toggle functionality
+  const menuButton = document.getElementById("menuButton");
+  const drawer = document.getElementById("drawer");
+
+  menuButton.addEventListener("click", () => {
+    drawer.style.display = drawer.style.display === "block" ? "none" : "block";
+  });
+
+  function closeDrawer() {
+    drawer.style.display = "none";
+  }
+
+  // Navigation functions for each menu item
+  function navigateToUserScreen() {
+    window.location.href = "users.html"; // Change this to the actual URL of your Users page
+  }
+
+  function navigateToSoilTestingScreen() {
+    window.location.href = "soilTesting.html"; // Change this to the actual URL of your Soil Testing page
+  }
+
+  function navigateToWaterTestingScreen() {
+    window.location.href = "waterTesting.html"; // Change this to the actual URL of your Water Testing page
+  }
+</script>
+
+<style>
+  /* Drawer styles */
+  .hamburger-menu {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  .drawer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    padding: 20px 0;
+  }
+
+  .drawer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .drawer-item {
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .drawer-item:hover {
+    background-color: #f1f1f1;
+  }
+</style>

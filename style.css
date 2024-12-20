@@ -116,3 +116,53 @@ button i {
   height: 100px;
   margin-bottom: 20px;
 }
+/* Hamburger Menu Icon */
+.hamburger-menu {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.hamburger-menu i {
+  font-size: 24px;
+  color: #333;
+  margin-left: -1rem;
+}
+
+/* Drawer Styles */
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -250px; /* Initially hidden off-screen */
+  width: 250px;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 999;
+  padding: 20px;
+}
+
+.drawer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.drawer-item {
+  padding: 15px 0;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.drawer-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Drawer Visible State */
+.drawer.open {
+  left: 0; /* Slide into view */
+}

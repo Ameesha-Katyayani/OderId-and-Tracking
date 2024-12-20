@@ -39,36 +39,38 @@ document
     }
   });
 
-document.getElementById("trackOrderButton").addEventListener("click", function () {
-  var trackingId = document.getElementById("orderId").value;
-  var trackingResult = document.getElementById("trackingResult");
+document
+  .getElementById("trackOrderButton")
+  .addEventListener("click", function () {
+    var trackingId = document.getElementById("orderId").value;
+    var trackingResult = document.getElementById("trackingResult");
 
-  console.log("Tracking ID entered:", trackingId);
+    console.log("Tracking ID entered:", trackingId);
 
-  if (trackingId) {
-    trackOrder(trackingId)
-      .then((data) => {
-        console.log("Tracking Data:", data);
-        if (data) {
-          displayTrackingData(data);
-        } else {
-          trackingResult.textContent = "Tracking information not found.";
+    if (trackingId) {
+      trackOrder(trackingId)
+        .then((data) => {
+          console.log("Tracking Data:", data);
+          if (data) {
+            displayTrackingData(data);
+          } else {
+            trackingResult.textContent = "Tracking information not found.";
+            trackingResult.style.color = "red";
+            trackingResult.style.display = "block";
+          }
+        })
+        .catch((error) => {
+          trackingResult.textContent = "Error fetching tracking information.";
           trackingResult.style.color = "red";
           trackingResult.style.display = "block";
-        }
-      })
-      .catch((error) => {
-        trackingResult.textContent = "Error fetching tracking information.";
-        trackingResult.style.color = "red";
-        trackingResult.style.display = "block";
-        console.error("Error fetching tracking information:", error);
-      });
-  } else {
-    trackingResult.textContent = "Please enter a Tracking ID.";
-    trackingResult.style.color = "red";
-    trackingResult.style.display = "block";
-  }
-});
+          console.error("Error fetching tracking information:", error);
+        });
+    } else {
+      trackingResult.textContent = "Please enter a Tracking ID.";
+      trackingResult.style.color = "red";
+      trackingResult.style.display = "block";
+    }
+  });
 
 function copyToClipboard() {
   var linkText = document.querySelector("#result a").href;
@@ -149,4 +151,31 @@ function displayTrackingData(data) {
       }</p>
     `;
   }
+}
+// Select the hamburger menu button and the drawer
+const menuButton = document.getElementById("menuButton");
+const drawer = document.getElementById("drawer");
+
+// Function to toggle drawer visibility
+menuButton.addEventListener("click", () => {
+  drawer.classList.toggle("open"); // Toggles the "open" class to show/hide the drawer
+});
+
+// Function to close the drawer
+function closeDrawer() {
+  drawer.classList.remove("open"); // Removes the "open" class to hide the drawer
+}
+
+// Navigate to the user screen
+function navigateToUserScreen() {
+  window.location.href = "users.html"; // Redirect to another HTML page
+  closeDrawer(); // Close the drawer after navigation
+}
+function navigateToSoilTestingScreen() {
+  window.location.href = "soilTesting.html"; // Redirect to the Soil Testing screen (soilTesting.html)
+  closeDrawer(); // Close the drawer after navigation
+}
+function navigateToWaterTestingScreen() {
+  window.location.href = "waterTesting.html"; // Redirect to the Soil Testing screen (soilTesting.html)
+  closeDrawer(); // Close the drawer after navigation
 }

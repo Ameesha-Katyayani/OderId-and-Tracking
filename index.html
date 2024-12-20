@@ -1,58 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Tracking</title>
-  <link rel="stylesheet" href="style.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-  />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
-</head>
-<body>
-  <div class="flex-container">
-    <div class="container">
-      <div class="header">
-        <img src="logo.png" alt="Logo" class="logo" />
-        <h1>Order Services</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Tracking</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="hamburger-menu">
+        <i class="fas fa-bars" id="menuButton"></i>
       </div>
-      <div id="lottie-animation" class="lottie-animation"></div>
-      <form id="orderForm">
-        <div class="form-group">
-          <label for="orderId">Enter OrderID</label>
-          <input
-            type="text"
-            id="orderId"
-            name="orderId"
-            placeholder="Enter your orderId"
-            required
-          />
+
+      <div class="drawer" id="drawer">
+        <ul>
+          <li class="drawer-item" onclick="navigateToUserScreen()">Users</li>
+          <li class="drawer-item" onclick="navigateToSoilTestingScreen()">
+            Soil Testing
+          </li>
+          <li class="drawer-item" onclick="navigateToWaterTestingScreen()">
+            Water Testing
+          </li>
+          <li class="drawer-item" onclick="closeDrawer()">Close</li>
+        </ul>
+      </div>
+
+      <div class="container">
+        <div class="header">
+          <img src="logo.png" alt="Logo" class="logo" />
+          <h1>Order Services</h1>
         </div>
-        <button type="submit" id="generateLinkButton">
-          <i class="fas fa-link"></i> Generate Link
-        </button>
-        <button type="button" id="trackOrderButton">
-          <i class="fas fa-search"></i> Track Order
-        </button>
-      </form>
-      <div id="resultContainer">
-        <p id="result"></p>
-        <button
-          id="copyButton"
-          onclick="copyToClipboard()"
-          style="display: none"
-        >
-          <i class="fas fa-copy"></i> Copy Link
-        </button>
-      </div>
-      <div id="trackingResult" style="display: none;"></div>
-      <div id="notification" class="notification">
-        Link copied to clipboard
+        <div id="lottie-animation" class="lottie-animation"></div>
+        <form id="orderForm">
+          <div class="form-group">
+            <label for="orderId">Enter OrderID</label>
+            <input
+              type="text"
+              id="orderId"
+              name="orderId"
+              placeholder="Enter your orderId"
+              required
+            />
+          </div>
+          <button type="submit" id="generateLinkButton">
+            <i class="fas fa-link"></i> Generate Link
+          </button>
+          <button type="button" id="trackOrderButton">
+            <i class="fas fa-search"></i> Track Order
+          </button>
+        </form>
+        <div id="resultContainer">
+          <p id="result"></p>
+          <button
+            id="copyButton"
+            onclick="copyToClipboard()"
+            style="display: none"
+          >
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
+        </div>
+        <div id="trackingResult" style="display: none"></div>
+        <div id="notification" class="notification">
+          Link copied to clipboard
+        </div>
       </div>
     </div>
-  </div>
-  <script src="index.js"></script>
-</body>
+    <script src="index.js"></script>
+  </body>
 </html>

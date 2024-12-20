@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Users Page</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    
+    <style>
+       body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+
+      .hamburger-menu {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 24px;
+      }
+
+      .drawer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #fff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        padding: 20px 0;
+      }
+
+      .drawer.open {
+        display: block;
+      }
+
+      .drawer ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .drawer-item {
+        padding: 15px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #ddd;
+        font-size: 16px;
+      }
+
+      .drawer-item:hover {
+        background-color: #f1f1f1;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      button {
+        display: inline-block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .result {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hamburger-menu" id="menuButton">
+      <i class="fas fa-bars"></i>
+    </div>
+
+   
+    <div class="container">
+      <h1>Enter Phone Number</h1>
+      <form id="phoneForm">
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <div style="display: flex; align-items: center;">
+            <span
+              style="
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-right: none;
+                border-radius: 5px 0 0 5px;
+                background-color: #f1f1f1;
+                font-size: 14px;
+              "
+              >+91</span
+            >
+            <input
+              type="text"
+              id="phoneNumber"
+              name="phoneNumber"
+              placeholder="Enter phone number"
+              required
+              style="
+                flex: 1;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 0 5px 5px 0;
+                font-size: 14px;
+              "
+            />
+          </div>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+      
+      <!-- Result Section -->
+<div class="result" id="resultContainer" style="display: none">
+    <h2>User Information</h2>
+    <p><strong>Mobile Number:</strong> <span id="mobile"></span></p>
+    <p><strong>Name:</strong> <span id="name"></span></p>
+    <p><strong>Role:</strong> <span id="role"></span></p>
+    <p><strong>Referral Code:</strong> <span id="referral"></span></p>
+    <p><strong>Address:</strong> <span id="address"></span></p>
+    <p><strong>City:</strong> <span id="city"></span></p>
+    <p><strong>Country:</strong> <span id="country"></span></p>
+    <p><strong>Pincode:</strong> <span id="pincode"></span></p>
+    <p><strong>State:</strong> <span id="state"></span></p>
+    <p><strong>Customer ID:</strong> <span id="customerId"></span></p>
+    <p><strong>Order Mobile Number:</strong> <span id="orderMobileNumber"></span></p>
+    <p><strong>State Code:</strong> <span id="stateCode"></span></p>
+    <p><strong>Crop:</strong> <span id="crop"></span></p>
+  </div>
+  
+
+    <!-- Firebase with Module -->
+    <script type="module">
+      // Import Firebase modules
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        query,
+        where,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+      // Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAlqg0XfRUj88bxGyBY_eCQcDBhMdv9s9w",
+        authDomain: "krishisevakendra-8430a.firebaseapp.com",
+        projectId: "krishisevakendra-8430a",
+        storageBucket: "krishisevakendra-8430a.appspot.com",
+        messagingSenderId: "1063108267034",
+        appId: "1:1063108267034:android:caf314f5c5184c1b45d5a3",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // Handle Form Submission
+      const phoneForm = document.getElementById("phoneForm");
+      const resultContainer = document.getElementById("resultContainer");
+      const mobileField = document.getElementById("mobile");
+      const nameField = document.getElementById("name");
+      const roleField = document.getElementById("role");
+      const referralField = document.getElementById("referral");
+      const versionField = document.getElementById("version");
+
+      phoneForm.addEventListener("submit", async function (event) {
+  event.preventDefault(); // Prevent page reload
+
+  // Get the user-entered phone number and prepend "+91"
+  const userPhoneInput = document.getElementById("phoneNumber").value.trim();
+  const phoneNumber = `+91${userPhoneInput}`; // Ensure +91 is always added
+
+  if (userPhoneInput === "" || userPhoneInput.length < 10) {
+    alert("Please enter a valid 10-digit phone number.");
+    return;
+  }
+
+  try {
+    // Query Firestore to get the document with the matching phone number
+    const q = query(
+      collection(db, "UpdateInformationPage"),
+      where("Mobile Number", "==", phoneNumber)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      // Get the data from the first document
+      const doc = querySnapshot.docs[0].data();
+
+      // Map fields to the result section
+      document.getElementById("mobile").textContent = doc["Mobile Number"] || "N/A";
+      document.getElementById("name").textContent = doc["Name"] || "N/A";
+      document.getElementById("role").textContent = doc["Role"] || "N/A";
+      document.getElementById("referral").textContent = doc["referral Code"] || "N/A";
+      document.getElementById("address").textContent = doc["Address"] || "N/A";
+      document.getElementById("city").textContent = doc["City"] || "N/A";
+      document.getElementById("country").textContent = doc["Country"] || "N/A";
+      document.getElementById("pincode").textContent = doc["Pincode"] || "N/A";
+      document.getElementById("state").textContent = doc["State"] || "N/A";
+      document.getElementById("customerId").textContent = doc["CustomerId"] || "N/A";
+      document.getElementById("orderMobileNumber").textContent =
+        doc["OrderMobileNumber"] || "N/A";
+      document.getElementById("stateCode").textContent = doc["State_Code"] || "N/A";
+      document.getElementById("crop").textContent = doc["crop"] || "N/A";
+
+      // Show the result container
+      resultContainer.style.display = "block";
+    } else {
+      alert("No user found with this phone number.");
+      resultContainer.style.display = "none";
+    }
+  } catch (error) {
+    console.error("Error fetching user data: ", error);
+    alert("An error occurred while fetching user data.");
+  }
+});
+
+
+
+    </script>
+  </body>
+</html>

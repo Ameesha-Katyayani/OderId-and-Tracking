@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soil Testing</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    
+    <style>
+       body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Drawer styles */
+      .hamburger-menu {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 24px;
+      }
+
+      .drawer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #fff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        padding: 20px 0;
+      }
+
+      .drawer.open {
+        display: block;
+      }
+
+      .drawer ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .drawer-item {
+        padding: 15px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #ddd;
+        font-size: 16px;
+      }
+
+      .drawer-item:hover {
+        background-color: #f1f1f1;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-size: 14px;
+        color: #555;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table th,
+      table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+
+      table th {
+        background-color: #007bff;
+        color: white;
+      }
+    </style>
+  </head>
+  <div>
+    <div class="hamburger-menu" id="menuButton">
+      <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Drawer Menu -->
+    <div class="drawer" id="drawer">
+      <ul>
+        <li class="drawer-item" onclick="navigateToUserScreen()">Users</li>
+        <li class="drawer-item" onclick="navigateToSoilTestingScreen()">Soil Testing</li>
+        <li class="drawer-item" onclick="navigateToWaterTestingScreen()">Water Testing</li>
+        <li class="drawer-item" onclick="closeDrawer()">Close</li>
+      </ul>
+    </div>
+
+    <div class="container">
+      <h1>Soil Testing Data</h1>
+
+      <label for="phoneNumber">Enter Phone Number</label>
+      <div style="display: flex; align-items: center; margin-bottom: 15px">
+        <span
+          style="
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 5px 0 0 5px;
+            background-color: #f1f1f1;
+            font-size: 14px;
+          "
+        >
+          +91
+        </span>
+        <input
+          type="text"
+          id="phoneNumber"
+          placeholder="Enter phone number"
+          required
+          style="
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 0 5px 5px 0;
+            font-size: 14px;
+          "
+        />
+      </div>
+
+      <button onclick="fetchSoilTestingData()">Fetch Data</button>
+      <button onclick="clearFields()">Clear</button>
+
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Country</th>
+            <th>Pincode</th>
+            <th>Payment ID</th>
+            <th>Amount</th>
+            <th>Order ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data Rows Will Be Dynamically Added Here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+      // Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAlqg0XfRUj88bxGyBY_eCQcDBhMdv9s9w",
+        authDomain: "krishisevakendra-8430a.firebaseapp.com",
+        projectId: "krishisevakendra-8430a",
+        storageBucket: "krishisevakendra-8430a.appspot.com",
+        messagingSenderId: "1063108267034",
+        appId: "1:1063108267034:android:caf314f5c5184c1b45d5a3",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // Fetch Soil Testing Data
+      window.fetchSoilTestingData = async function () {
+        const phoneNumberInput = document
+          .getElementById("phoneNumber")
+          .value.trim();
+        const phoneNumber = `+91${phoneNumberInput}`;
+
+        if (!phoneNumberInput || phoneNumberInput.length < 10) {
+          console.log("Please enter a valid 10-digit phone number.");
+          return;
+        }
+
+        try {
+          // Check specific document in "Soil Testing"
+          const soilTestingDocRef = doc(db, `Soil Testing`, phoneNumber);
+          const soilTestingDoc = await getDoc(soilTestingDocRef);
+
+          const dataTable = document
+            .getElementById("dataTable")
+            .getElementsByTagName("tbody")[0];
+          dataTable.innerHTML = ""; // Clear table rows
+
+          if (soilTestingDoc.exists()) {
+            const documentData = soilTestingDoc.data();
+            console.log("Document Data Found:", documentData);
+
+            const dataArray = documentData.data;
+
+            if (Array.isArray(dataArray)) {
+              dataArray.forEach((entry) => {
+                const row = dataTable.insertRow();
+                row.insertCell(0).textContent = formatDate(entry.date) || "N/A";
+                row.insertCell(1).textContent = entry.name || "N/A";
+                row.insertCell(2).textContent = entry.address || "N/A";
+                row.insertCell(3).textContent = entry.city || "N/A";
+                row.insertCell(4).textContent = entry.state || "N/A";
+                row.insertCell(5).textContent = entry.country || "N/A";
+                row.insertCell(6).textContent = entry.pincode || "N/A";
+                row.insertCell(7).textContent = entry.paymentId || "N/A";
+                row.insertCell(8).textContent = entry.amount || "N/A";
+                row.insertCell(9).textContent = entry.orderId || "N/A";
+              });
+            }
+          } else {
+            console.log(
+              "No direct document found. Searching in all documents..."
+            );
+
+            const soilTestingCollection = collection(db, `Soil Testing`);
+            const querySnapshot = await getDocs(soilTestingCollection);
+
+            let found = false;
+
+            querySnapshot.forEach((doc) => {
+              const documentData = doc.data();
+
+              if (documentData["Mobile Number"] === phoneNumber) {
+                const row = dataTable.insertRow();
+                row.insertCell(0).textContent =
+                  formatDate(documentData.date) || "N/A";
+                row.insertCell(1).textContent = documentData.Name || "N/A";
+                row.insertCell(2).textContent = documentData.address || "N/A";
+                row.insertCell(3).textContent = documentData.city || "N/A";
+                row.insertCell(4).textContent = documentData.state || "N/A";
+                row.insertCell(5).textContent = documentData.country || "N/A";
+                row.insertCell(6).textContent = documentData.pincode || "N/A";
+                row.insertCell(7).textContent = documentData.paymentId || "N/A";
+                row.insertCell(8).textContent = documentData.price || "N/A";
+                row.insertCell(9).textContent = documentData.orderId || "N/A";
+                found = true;
+              }
+            });
+
+            if (!found) {
+              console.log("No data found for the given phone number.");
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching soil testing data:", error);
+        }
+      };
+
+      // Helper function to format timestamps
+      function formatDate(timestamp) {
+        if (!timestamp) return "N/A";
+        const date = new Date(parseInt(timestamp));
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      // Clear Fields and Reset Table
+      window.clearFields = function () {
+        document.getElementById("phoneNumber").value = "";
+        const dataTable = document
+          .getElementById("dataTable")
+          .getElementsByTagName("tbody")[0];
+        dataTable.innerHTML = "";
+      };
+
+      const menuButton = document.getElementById("menuButton");
+const drawer = document.getElementById("drawer");
+
+// Function to toggle drawer visibility
+menuButton.addEventListener("click", () => {
+  drawer.classList.toggle("open"); // Toggles the "open" class to show/hide the drawer
+});
+
+// Function to close the drawer
+function closeDrawer() {
+  drawer.classList.remove("open"); // Removes the "open" class to hide the drawer
+}
+// Navigate to the user screen
+function navigateToUserScreen() {
+  window.location.href = "users.html"; // Redirect to users.html
+  closeDrawer(); // Close the drawer after navigation
+}
+
+// Navigate to the soil testing screen
+function navigateToSoilTestingScreen() {
+  window.location.href = "soilTesting.html"; // Redirect to soilTesting.html
+  closeDrawer(); // Close the drawer after navigation
+}
+
+// Navigate to the water testing screen
+function navigateToWaterTestingScreen() {
+  window.location.href = "waterTesting.html"; // Redirect to waterTesting.html
+  closeDrawer(); // Close the drawer after navigation
+}
+
+
+
+    </script>
+   
+    
+  </body>
+</html>
