@@ -37,6 +37,49 @@
         margin-bottom: 5px;
       }
 
+      .hamburger-menu {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 24px;
+      }
+
+      .drawer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #fff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        padding: 20px 0;
+      }
+
+      .drawer.open {
+        display: block;
+      }
+
+      .drawer ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .drawer-item {
+        padding: 15px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #ddd;
+        font-size: 16px;
+      }
+
+      .drawer-item:hover {
+        background-color: #f1f1f1;
+      }
+
       input[type="text"] {
         width: 100%;
         padding: 10px;
@@ -81,6 +124,21 @@
     </style>
   </head>
   <body>
+    
+    <div class="hamburger-menu" id="menuButton">
+      <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Drawer Menu -->
+    <div class="drawer" id="drawer">
+      <ul>
+        <li class="drawer-item" onclick="navigateToUserScreen()">Users</li>
+        <li class="drawer-item" onclick="navigateToSoilTestingScreen()">Soil Testing</li>
+        <li class="drawer-item" onclick="navigateToWaterTestingScreen()">Water Testing</li>
+        <li class="drawer-item" onclick="closeDrawer()">Close</li>
+      </ul>
+    </div>
+
     <div class="container">
       <h1>Water Testing Data</h1>
 
@@ -260,6 +318,38 @@
           .getElementsByTagName("tbody")[0];
         dataTable.innerHTML = "";
       };
+
+
+      const menuButton = document.getElementById("menuButton");
+      const drawer = document.getElementById("drawer");
+      
+      // Function to toggle drawer visibility
+      menuButton.addEventListener("click", () => {
+        drawer.classList.toggle("open"); // Toggles the "open" class to show/hide the drawer
+      });
+      
+      // Function to close the drawer
+      function closeDrawer() {
+        drawer.classList.remove("open"); // Removes the "open" class to hide the drawer
+      }
+      // Navigate to the user screen
+      function navigateToUserScreen() {
+        window.location.href = "users.html"; // Redirect to users.html
+        closeDrawer(); // Close the drawer after navigation
+      }
+      
+      // Navigate to the soil testing screen
+      function navigateToSoilTestingScreen() {
+        window.location.href = "soilTesting.html"; // Redirect to soilTesting.html
+        closeDrawer(); // Close the drawer after navigation
+      }
+      
+      // Navigate to the water testing screen
+      function navigateToWaterTestingScreen() {
+        window.location.href = "waterTesting.html"; // Redirect to waterTesting.html
+        closeDrawer(); // Close the drawer after navigation
+      }
     </script>
+    <script src="index.js"></script>
   </body>
 </html>

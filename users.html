@@ -121,9 +121,23 @@
     </style>
   </head>
   <body>
+    <script src="index.js"></script>
+
     <div class="hamburger-menu" id="menuButton">
       <i class="fas fa-bars"></i>
     </div>
+
+    <!-- Drawer Menu -->
+    <div class="drawer" id="drawer">
+      <ul>
+        <li class="drawer-item" onclick="navigateToUserScreen()">Users</li>
+        <li class="drawer-item" onclick="navigateToSoilTestingScreen()">Soil Testing</li>
+        <li class="drawer-item" onclick="navigateToWaterTestingScreen()">Water Testing</li>
+        <li class="drawer-item" onclick="closeDrawer()">Close</li>
+      </ul>
+    </div>
+
+
 
    
     <div class="container">
@@ -268,7 +282,35 @@
   }
 });
 
-
+const menuButton = document.getElementById("menuButton");
+      const drawer = document.getElementById("drawer");
+      
+      // Function to toggle drawer visibility
+      menuButton.addEventListener("click", () => {
+        drawer.classList.toggle("open"); // Toggles the "open" class to show/hide the drawer
+      });
+      
+      // Function to close the drawer
+      function closeDrawer() {
+        drawer.classList.remove("open"); // Removes the "open" class to hide the drawer
+      }
+      // Navigate to the user screen
+      function navigateToUserScreen() {
+        window.location.href = "users.html"; // Redirect to users.html
+        closeDrawer(); // Close the drawer after navigation
+      }
+      
+      // Navigate to the soil testing screen
+      function navigateToSoilTestingScreen() {
+        window.location.href = "soilTesting.html"; // Redirect to soilTesting.html
+        closeDrawer(); // Close the drawer after navigation
+      }
+      
+      // Navigate to the water testing screen
+      function navigateToWaterTestingScreen() {
+        window.location.href = "waterTesting.html"; // Redirect to waterTesting.html
+        closeDrawer(); // Close the drawer after navigation
+      }
 
     </script>
   </body>
